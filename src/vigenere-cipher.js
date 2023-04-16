@@ -20,13 +20,40 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(isDirect = true) {
+    this.isDirect = isDirect;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  encrypt(message, key) {
+    if (message == undefined || key == undefined) {
+      throw new Error('Incorrect arguments!');
+    }
+    let i = 0;
+    message = message.toUpperCase();
+    key = key.toUpperCase();
+    let code = message.replace(/[a-z]/ig, word => {
+      let posMessage = word.codePointAt(0) - 65;
+      let posKey = key.codePointAt(i) - 65;
+      let result = String.fromCodePoint((posMessage + posKey) % 26 + 65);
+      i = (i < key.length - 1) ? i + 1 : 0;
+      return result;
+    });
+    return (this.isDirect === true) ? code : code.split('').reverse().join('');
+  }
+  decrypt(encryptedMessage, key) {
+    if (encryptedMessage == undefined || key == undefined) {
+      throw new Error('Incorrect arguments!');
+    }
+    encryptedMessage = encryptedMessage.toUpperCase();
+    key = key.toUpperCase();
+    let i = 0;
+    let message = encryptedMessage.replace(/[a-z]/ig, word => {
+      let posCode = word.codePointAt(0) - 65;
+      let posKey = key.codePointAt(i) - 65;
+      let result = String.fromCodePoint((posCode + 26 - posKey) % 26 + 65);
+      i = (i < key.length - 1) ? i + 1 : 0;
+      return result;
+    });
+    return (this.isDirect === true) ? message : message.split('').reverse().join('');
   }
 }
 
